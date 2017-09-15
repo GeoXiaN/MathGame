@@ -1,0 +1,520 @@
+// This is my project "Math Game" 
+
+import java.util.Scanner;			
+import java.io.*;					
+import java.util.Random;			
+
+public class The_Math_Game
+{
+	public static void main(String[] args)			throws IOException
+	{
+		String userLogin;
+
+		
+		titleScreen();
+
+	
+		clearScreen();
+
+		
+		userLogin = login();
+		clearScreen();
+
+		
+		menuScreen(userLogin);
+	}
+
+	public static void titleScreen()
+	{
+		String userContinues;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		for(int i = 0; i < 3; i++)
+			System.out.println("***********************");
+		System.out.println("******" + "           " + "******");
+		System.out.println("******" + "TheMathGame" + "******");
+		System.out.println("******" + " By Georgii  " + "******");
+		System.out.println("******" + "  Logashenko  " + "******");
+		System.out.println("******" + "           " + "******");
+		for(int i = 0; i < 3; i++)
+			System.out.println("***********************");
+		System.out.println();
+		System.out.println();
+
+		System.out.println("Please enter any key to continue");
+		userContinues = keyboard.nextLine();
+	}
+	public static void clearScreen()
+	{
+		for(int i = 0; i < 25; i++)
+		System.out.println();
+	}
+	public static String login()
+	{
+		String userName;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		System.out.println("Please inter your name and press <ENTER>");
+		userName = keyboard.nextLine();
+		userName = checkName(userName);
+		userName = userName.toLowerCase();
+		return userName;
+	}
+
+	public static String checkName(String userString)
+	{
+		int userStringLength = userString.length();
+		int	counter = 0;								
+
+		Scanner keyboard = new Scanner(System.in);
+
+	
+		while(userStringLength == 0)
+		{
+			System.out.println("There is nothing.");
+			System.out.println("Please type your name and press <ENTER>");
+			userString = keyboard.nextLine();
+			userStringLength = userString.length();
+		}
+
+
+		while(counter < userStringLength)
+		{
+			if(!Character.isLetter(userString.charAt(counter)))
+			{
+				System.out.println("Your input is invalid.");
+				System.out.println("Please type your name and press <ENTER>");
+				userString = keyboard.nextLine();
+				userStringLength = userString.length();
+				counter = 0;
+			}
+			else
+				counter++;
+			while(userStringLength == 0)
+			{
+				System.out.println("There is nothing.");
+				System.out.println("Please type your name and press <ENTER>");
+				userString = keyboard.nextLine();
+				userStringLength = userString.length();
+			}
+		}
+
+		return userString;
+	}
+
+
+	
+	public static void menuScreen(String userName)			throws IOException
+	{
+		final int PLACEHOLDER_VALUE = 2;
+		final int CORRECT_VALUE = 1;
+		final int WRONG_VALUE = 0;
+
+		int answerValue = PLACEHOLDER_VALUE;
+		boolean exitBool = false;
+		String menuString;
+		char menuChar;
+
+
+		Scanner keyboard = new Scanner(System.in);
+
+		do{
+			
+			if(answerValue == CORRECT_VALUE)
+			{
+				System.out.println("***********" + "RIGHT!" + "***********");
+				System.out.println();
+			}
+			if(answerValue == WRONG_VALUE)
+			{
+				System.out.println("***********" + "WRONG!" + "***********");
+				System.out.println();
+			}
+
+			
+			answerValue = updateStats(userName, answerValue);
+
+			
+			System.out.println("******" + "CHOOSE A PROBLEM" + "******");
+			System.out.println("******" + "****************" + "******");
+			System.out.println("******" + "****************" + "******");
+			System.out.println("******" + "                " + "******");
+			System.out.println("******" + " 1. ADD         " + "******");
+			System.out.println("******" + " 2. SUBTRACT    " + "******");
+			System.out.println("******" + " 3. MULTIPLY    " + "******");
+			System.out.println("******" + " 4. DIVIDE      " + "******");
+			System.out.println("******" + " 5. STATS       " + "******");
+			System.out.println("******" + " n/N to QUIT    " + "******");
+			System.out.println("******" + "                " + "******");
+			System.out.println("******" + "****************" + "******");
+			System.out.println("******" + "****************" + "******");
+
+			menuString = keyboard.nextLine();
+			menuChar = menuString.charAt(0);
+
+			
+			switch (menuChar)
+			{
+				case '1':
+					clearScreen();
+					answerValue = addition();
+					break;
+				case '2':
+					clearScreen();
+					answerValue = subtraction();
+					break;
+				case '3':
+					clearScreen();
+					answerValue = multiplication();
+					break;
+				case '4':
+					clearScreen();
+					answerValue = division();
+					break;
+				case '5':
+					clearScreen();
+					statistics(userName);
+					break;
+				case 'n':
+				case 'N':
+					clearScreen();
+					exitBool = true;
+					break;
+				default:
+					clearScreen();
+					System.out.println("That is not a valid choice. Please try again!");
+			}
+		} while(!exitBool);
+	}
+
+
+	
+	public static int updateStats(String userName, int answerValue)		throws IOException
+	{
+		final int PLACEHOLDER_VALUE = 2;     
+		final int CORRECT_VALUE = 1;		
+		final int WRONG_VALUE = 0;			
+		final double MONEY_LOST = 0.03;
+		final double MONEY_GAINED = 0.05;
+		boolean correctAnswer = false, wrongAnswer = false, exitBool = false;
+		int questionsCorrect, questionsWrong;
+		double moneyEarned;
+		File userFile = new File(userName + ".txt");
+		if(userFile.exists())
+		{
+			Scanner inputFile = new Scanner(userFile);
+			userName = inputFile.nextLine();
+			questionsCorrect = inputFile.nextInt();
+			questionsWrong = inputFile.nextInt();
+			moneyEarned = inputFile.nextDouble();
+		}
+		else
+		{
+			questionsCorrect = 0;
+			questionsWrong = 0;
+			moneyEarned = 0;
+		}
+
+		if(answerValue == CORRECT_VALUE)
+		{
+			correctAnswer = true;
+			answerValue = PLACEHOLDER_VALUE;
+		}
+		if(answerValue == WRONG_VALUE)
+		{
+			wrongAnswer = true;
+			answerValue = PLACEHOLDER_VALUE;
+		}
+
+		if(correctAnswer)
+			questionsCorrect += 1;
+		if(wrongAnswer)
+			questionsWrong += 1;
+
+		moneyEarned = (questionsCorrect) * (MONEY_GAINED) - (questionsWrong) * (MONEY_LOST);
+	
+		if(moneyEarned < 0.0)
+			moneyEarned = 0.0;
+
+	
+		PrintWriter outputFile = new PrintWriter(userName + ".txt");
+		outputFile.println(userName);
+		outputFile.println(questionsCorrect);
+		outputFile.println(questionsWrong);
+		outputFile.println(moneyEarned);
+
+		outputFile.close();
+
+		return answerValue;
+	}
+
+
+		
+	public static int addition()
+	{
+		final int CORRECT_VALUE = 1;
+		final int WRONG_VALUE = 0;
+
+		int firstNumber, secondNumber, correctAnswer, userAnswer;
+		String userString;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		
+		Random randomNumbers = new Random();
+
+		
+		firstNumber = randomNumbers.nextInt(10) + 1;
+		secondNumber = randomNumbers.nextInt(10) + 1;
+		correctAnswer = firstNumber + secondNumber;
+
+	
+		System.out.println("******" + "ADDITION" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("***** "  + firstNumber + " + " + secondNumber
+								+ "=? " + "*****");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		userString = keyboard.nextLine();
+
+		
+		userAnswer = checkNumber(userString);
+
+	
+		if(userAnswer == correctAnswer)
+		{
+			clearScreen();
+			return CORRECT_VALUE;
+		}
+		else
+		{
+			clearScreen();
+			return WRONG_VALUE;
+		}
+	}
+
+
+	
+	public static int checkNumber(String userString)
+	{
+		int userAnswer;
+		int userStringLength = userString.length();
+		int counter = 0;			
+
+		Scanner keyboard = new Scanner(System.in);
+
+		
+		while (userStringLength == 0)
+		{
+			System.out.println("You entered nothing.");
+			System.out.println("Please enter a positive integer");
+			userString = keyboard.nextLine();
+			userStringLength = userString.length();
+		}
+
+		
+		while(counter < userStringLength)
+		{
+			if(!Character.isDigit(userString.charAt(counter)))
+			{
+				System.out.println("That is not a positive integer.");
+				System.out.println("Please enter a positive integer.");
+				userString = keyboard.nextLine();
+				userStringLength = userString.length();
+				counter = 0;
+			}
+			else
+				counter++;
+			while(userStringLength == 0)
+			{
+				System.out.println("You entered nothing.");
+				System.out.println("Please enter a positive integer");
+				userString = keyboard.nextLine();
+				userStringLength = userString.length();
+			}
+		}
+
+		
+		userAnswer = Integer.parseInt(userString);
+		return userAnswer;
+	}
+
+	
+	public static int subtraction()
+	{
+		final int CORRECT_VALUE = 1;
+		final int WRONG_VALUE = 0;
+
+		int firstNumber, secondNumber, correctAnswer, userAnswer;
+		String userString;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		
+		Random randomNumbers = new Random();
+
+		
+		firstNumber = randomNumbers.nextInt(10) + 1;
+		secondNumber = randomNumbers.nextInt(10) + 1;
+
+		
+		while(firstNumber < secondNumber)
+			secondNumber = secondNumber - firstNumber;
+
+		
+		correctAnswer = firstNumber - secondNumber;
+
+		
+		System.out.println("******" + "SUBTRACTION" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("***** "  + firstNumber + " - " + secondNumber
+									+ "=? " + "*****");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		userString = keyboard.nextLine();
+		userAnswer = checkNumber(userString);
+		if(userAnswer == correctAnswer)
+		{
+			clearScreen();
+			return CORRECT_VALUE;
+		}
+		else
+		{
+			clearScreen();
+			return WRONG_VALUE;
+		}
+	}
+
+	public static int multiplication()
+	{
+		final int CORRECT_VALUE = 1;
+		final int WRONG_VALUE = 0;
+
+		int firstNumber, secondNumber, correctAnswer, userAnswer;
+		String userString;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		Random randomNumbers = new Random();
+
+	
+		firstNumber = randomNumbers.nextInt(10) + 1;
+		secondNumber = randomNumbers.nextInt(10) + 1;
+
+	
+		correctAnswer = firstNumber * secondNumber;
+
+		System.out.println("******" + "MULTIPLICATION" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("***** "  + firstNumber + " * " + secondNumber
+										+ "=? " + "*****");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		userString = keyboard.nextLine();
+
+		
+		userAnswer = checkNumber(userString);
+
+		
+		if(userAnswer == correctAnswer)
+		{
+			clearScreen();
+			return CORRECT_VALUE;
+		}
+		else
+		{
+			clearScreen();
+			return WRONG_VALUE;
+		}
+	}
+
+	public static int division()
+	{
+		final int CORRECT_VALUE = 1;
+		final int WRONG_VALUE = 0;
+
+		int numerator, denominator, correctAnswer, userAnswer;
+		String userString;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		
+		Random randomNumbers = new Random();
+
+		
+		denominator = randomNumbers.nextInt(10) + 1;
+		correctAnswer = randomNumbers.nextInt(10) + 1;
+
+		
+		numerator = denominator * correctAnswer;
+
+		
+		System.out.println("******" + "DIVISION" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		System.out.println("***** "  + numerator + " / " + denominator
+										+ "=? " + "*****");
+		System.out.println("******" + "********" + "******");
+		System.out.println("******" + "********" + "******");
+		userString = keyboard.nextLine();
+
+	
+		userAnswer = checkNumber(userString);
+
+	
+		if(userAnswer == correctAnswer)
+		{
+			clearScreen();
+			return CORRECT_VALUE;
+		}
+		else
+		{
+			clearScreen();
+			return WRONG_VALUE;
+		}
+	}
+
+	public static void statistics(String userName)		throws IOException
+	{
+		int questionsCorrect, questionsWrong;
+		double moneyEarned;
+		String userContinues;
+		File userFile = new File(userName + ".txt");
+
+		Scanner keyboard = new Scanner(System.in);
+
+		if(userFile.exists())
+		{
+			Scanner inputFile = new Scanner(userFile);
+
+			userName = inputFile.nextLine();
+			questionsCorrect = inputFile.nextInt();
+			questionsWrong = inputFile.nextInt();
+			moneyEarned = inputFile.nextDouble();
+		}
+		else
+		{
+			questionsCorrect = 0;
+			questionsWrong = 0;
+			moneyEarned = 0;
+		}
+
+		System.out.println(userName);
+		System.out.println("Questions Correct: " + questionsCorrect);
+		System.out.println("Questions Incorrect: " + questionsWrong);
+		System.out.printf("Money Earned: $%.2f\n", moneyEarned);
+		System.out.println();
+		System.out.println();
+
+		System.out.println("Please enter any key to continue");
+		userContinues = keyboard.nextLine();
+
+		clearScreen();
+	}
+
+}

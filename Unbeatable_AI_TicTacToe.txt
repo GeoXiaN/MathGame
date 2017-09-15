@@ -1,0 +1,285 @@
+/**Made by Georgii A Logashenko **/
+
+
+import java.util.Scanner;
+import java.util.Random;
+
+
+public class TicTacToe
+{
+
+    public static void main (String[] args)
+    {
+        char[] options = {'0','1','2','3','4','5','6','7','8'}; // Values for the Game Board
+
+        String userInput = null;
+        int Pmove = 0;
+        int counter = 0;
+        int counter2 = 0;
+        int counter3 = 0;
+        int trigger = 0;
+        int tie = 0;
+        Scanner keyboard = new Scanner(System.in);
+
+        splashScreen(userInput, keyboard); //Title screen for a game
+        clearScreen();
+        
+        do
+        {
+            do
+            {
+                displayGrid(userInput,keyboard,options); //Displays Tic-Tac-Toe grid
+                checkPositionAvalibility(userInput,options, Pmove); //Validates and checks avaliablitiy of player's move.
+                trigger = checkWin(options, trigger, counter, counter2, counter3); // Checks for a winner
+                tie++;
+                if (tie >= 9 && trigger == 0) //Determines if all the spots are occupied
+                {
+                    System.out.println("Its a Tie! You are both loosers!");
+                    trigger = 1;
+                }
+                else if (trigger == 0)
+                {
+                    tie++;
+                    computerMove(options); // Machine's move
+                    trigger = checkWin(options, trigger, counter, counter2, counter3);
+                }
+            }while (trigger == 0);
+            tie = 0;
+            System.out.println("Would you like to play again? Press y/Y to continue or any other character to quit");
+            userInput = keyboard.nextLine();
+            if(userInput.equalsIgnoreCase("Y")) //Game reset
+            {
+                options = new char[] {'0','1','2','3','4','5','6','7','8'};
+                trigger = 0;
+            }
+            else if(!userInput.equalsIgnoreCase("Y")|| userInput.isEmpty())
+            {
+                System.out.println("Do svidania! (See you!)");
+                trigger = 2;
+            }
+        }while (trigger !=2);
+
+
+    }
+
+    public static void splashScreen (String userInput, Scanner keyboard)
+	{
+		String userContinues;
+
+		for(int i = 0; i < 3; i++)
+		System.out.println("***********************");
+		System.out.println("******" + "           " + "******");
+		System.out.println("******" + "TIC_TAC_TOE" + "******");
+		System.out.println("******" + " By Georgii" + "******");
+		System.out.println("******" + " Logashenko" + "******");
+		System.out.println("******" + "           " + "******");
+		for(int i = 0; i < 3; i++)
+		System.out.println("***********************");
+		System.out.println();
+		System.out.println();
+
+		System.out.println("Please enter any key to continue");
+		userContinues = keyboard.nextLine();
+	}
+	public static void clearScreen()
+	{
+		for(int i = 0; i < 25; i++)
+		System.out.println();
+	}
+	public static String login()// Gets Player's Name
+	{
+		String userName;
+
+		Scanner keyboard = new Scanner(System.in);
+
+		System.out.println("Please inter your name and press <ENTER>");
+		userName = keyboard.nextLine();
+		userName = checkName(userName);
+		userName = userName.toLowerCase();
+		return userName;
+	}
+
+	public static String checkName(String userString)//Checks for Input
+	{
+		int userStringLength = userString.length();
+		int	counter = 0;								
+
+		Scanner keyboard = new Scanner(System.in);
+
+	
+		while(userStringLength == 0)
+		{
+			System.out.println("There is nothing.");
+			System.out.println("Please type your name and press <ENTER>");
+			userString = keyboard.nextLine();
+			userStringLength = userString.length();
+		}
+
+
+		while(counter < userStringLength)
+		{
+			if(!Character.isLetter(userString.charAt(counter)))
+			{
+				System.out.println("Your input is invalid.");
+				System.out.println("Please type your name and press <ENTER>");
+				userString = keyboard.nextLine();
+				userStringLength = userString.length();
+				counter = 0;
+			}
+			else
+				counter++;
+			while(userStringLength == 0)
+			{
+				System.out.println("There is nothing.");
+				System.out.println("Please type your name and press <ENTER>");
+				userString = keyboard.nextLine();
+				userStringLength = userString.length();
+			}
+		}
+
+		return userString;
+		}
+
+    public static void displayGrid(String userInput, Scanner keyboard, char[] options) // Game Board
+    {
+        System.out.printf("Tic-Tac-Toe\n" + "  |-----|\n" + "  |%s|%s|%s|\n" + "  |%s|%s|%s|\n" + "  |%s|%s|%s|\n" + "  |-----|\n",
+                options[0], options[1], options[2], options[3], options[4], options[5], options[6], options[7], options[8]);
+    }
+    public static String validatePlayersMove(String userInput) //Validates the Player's input
+    {
+        int userInputLength = userInput.length();
+        int stop = 0;
+        Scanner keyboard = new Scanner(System.in);
+
+        while (userInputLength == 0 || userInputLength > 1)
+        {
+            System.out.println("Incorrect Input. Choose an integer from 0-8.");
+            userInput = keyboard.nextLine();
+            userInputLength = userInput.length();
+        }
+        while (userInputLength == 1 && stop == 0)
+        {
+            if (Character.isLetter(userInput.charAt(0)))
+            {
+                System.out.println("That is not a number. Choose an integer from 0-8.");
+                userInput = keyboard.nextLine();
+                userInputLength = userInput.length();
+            }
+            else if (userInput.charAt(0) == '9' || userInput.charAt(0) == ' ' )
+            {
+                System.out.println("Incorrect Input. Choose an integer from 0-8.");
+                userInput = keyboard.nextLine();
+                userInputLength = userInput.length();
+            }
+            else
+                stop = 1;
+            while (userInputLength == 0 || userInputLength > 1)
+            {
+                System.out.println("Incorrect Input. Choose an integer from 0-8.");
+                userInput = keyboard.nextLine();
+                userInputLength = userInput.length();
+            }
+        }
+        return userInput;
+    }
+
+    public static char[] checkPositionAvalibility(String userInput,char[] options, int Pmove) //Checks if any spots are avaliable
+    {
+        Scanner keyboard = new Scanner(System.in);
+
+        System.out.print("It is your turn comrade!\nMake your Motherland Proud!\n");
+        userInput = keyboard.nextLine();
+        userInput = validatePlayersMove(userInput);
+        Pmove = Integer.parseInt(userInput);
+
+        while ((options[Pmove] == 'H') || (options[Pmove] == 'C'))
+        {
+            System.out.println("Spot is already occupied by Computer. Choose another one.");
+            userInput = keyboard.nextLine();
+            userInput = validatePlayersMove(userInput);
+            Pmove = Integer.parseInt(userInput);
+        }
+        if ((options[Pmove] != 'H') || (options[Pmove] != 'C'))
+            options[Pmove] = 'H';
+
+        return options;
+    }
+    public static char[] computerMove(char[] options) //Determines the Computer's move.
+    {
+        Random randomNumbers = new Random();
+        int COption = randomNumbers.nextInt(8)+1;
+
+        if (options[4] != 'H' && options[4] != 'C')
+        {
+            options[4] = 'C';
+        }
+        else if (options[4] == 'H' || options[4] == 'C')
+        {
+            while (options[COption] == 'H' || options[COption] == 'C')
+                COption = randomNumbers.nextInt(8)+1;
+            if (options[COption] != 'H' || options[COption] != 'C')
+                options[COption] = 'C';
+        }
+
+        return options;
+    }
+
+
+    public static int checkWin (char[] options, int trigger, int counter, int counter2, int counter3) //Checks for the winner
+    {
+
+            for (counter = 0, counter2 = 3, counter3 = 6; counter3 <=8; counter++, counter2++, counter3++)
+            {
+                if ((options[counter] == options[counter2]) && (options[counter2] == options[counter3]))
+                {
+                    if (options[counter] == 'H') {
+                        System.out.println( "Comrade " + login() +" Wins!");
+                        trigger = 1;
+                    }
+                    else if (options[counter] == 'C') {
+                        System.out.println("Superior Artificial Intelligence Wins!");
+                        trigger = 1;
+                    }
+                }
+            }
+            for (counter = 0, counter2 = 1, counter3 = 2; counter3 <=8; counter += 3, counter2 += 3, counter3 += 3)
+            {
+                if ((options[counter] == options[counter2]) && (options[counter2] == options[counter3]))
+                {
+                    if ((options[counter] == options[counter2]) && (options[counter2] == options[counter3]))
+                    {
+                        if (options[counter] == 'H') {
+                            System.out.println( "Comrade " +login() +" Wins!");
+                            trigger = 1;
+                        }
+                        else if (options[counter] == 'C') {
+                            System.out.println("Superior Artificial Intelligence Wins!");
+                            trigger = 1;
+                        }
+                    }
+                }
+            }
+            for (counter = 0, counter2 = 4, counter3 = 8; counter <= 2; counter += 2, counter2 +=0, counter3 -= 2)
+            {
+                if ((options[counter] == options[counter2]) && (options[counter2] == options[counter3]))
+                {
+                    if ((options[counter] == options[counter2]) && (options[counter2] == options[counter3]))
+                    {
+                        if (options[counter] == 'H')
+                        {
+                            System.out.println("Comrade " + login() + " Wins!");
+                            trigger = 1;
+                        }
+                        else if (options[counter] == 'C')
+                        {
+                            System.out.println("Superior Artificial Intelligence Wins!");
+                            trigger = 1;
+                        }
+                    }
+                }
+            }
+
+        return trigger;
+    }
+
+}
